@@ -45,25 +45,25 @@ Services
     :param str semanticDataSpecification:  URI that allows to filter for a specific semantic data specification that prescribes structured and standardized formats for the organization, description, and interpretation of data to ensure attribute conformity, semantic consistency, and interoperable exchange among systems, applications, and users, independent of the media type. 
     :param str schemaMediaType: media type according to IETF RFC 6838,  shall filter for the distribution of the data model schema the attribute conforms to. 
     :return: .. code-block:: json
-{
-  "attributes": [
     {
-      "attributeIdentifier": "<string:uri>",
-      "title": [
-        { "value": "<string>", "language": "<string:iso639-1>" }
-      ],
-      "description": [
-        { "value": "<string>", "language": "<string:iso639-1>" }
-      ],
-      "creator": "<string>",
-      "country": "<string:iso3166-alpha2>",
-      "semanticDataSpecification": "<string:uri>",
-      "schemaDistribution": [
-        { "accessURL": "<string:uri>", "mediaType": "<string>" }
+      "attributes": [
+        {
+          "attributeIdentifier": "<string:uri>",
+          "title": [
+            { "value": "<string>", "language": "<string:iso639-1>" }
+          ],
+          "description": [
+            { "value": "<string>", "language": "<string:iso639-1>" }
+          ],
+          "creator": "<string>",
+          "country": "<string:iso3166-alpha2>",
+          "semanticDataSpecification": "<string:uri>",
+          "schemaDistribution": [
+            { "accessURL": "<string:uri>", "mediaType": "<string>" }
+          ]
+        }
       ]
     }
-  ]
-}
     In case of error the value is replaced with an error code
 
 .. py:function:: FindAuthenticSource(queryType, attributeIdentifier, country)
