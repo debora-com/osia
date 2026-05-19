@@ -657,7 +657,7 @@ components:
           description: Media type of the schema (e.g., application/json)
       additionalProperties: false
 
-   findAuthenticSourceResponse:
+    findAuthenticSourceResponse:
       type: object
       required:
         - dataServices
