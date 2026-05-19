@@ -5,9 +5,9 @@ Authentic Sources Services
 Authentic Sources Services consist of a set of services implemented on top of identity systems to favour third parties
 consumption of identity data. The services can be classified in four sets:
 
-- Public discovery of available attributes and data services (Discover)
+- Discovery: Public discovery of available attributes and data services
 
-- Submitting citizen ID attributes for validation (Verify)
+- Verification: Submitting citizen ID attributes for validation
 
   The purpose is to extend the use of government-issued identity to registered
   third party services. The individual will submit their ID attributes to the third party in order to enroll
@@ -22,45 +22,28 @@ consumption of identity data. The services can be classified in four sets:
       the data held in the database therefore being able to confidently identify the new subscriber. This scenario
       can be replicated across multiple sectors including banking and finance.
 
-- Retrieve actual attribute values from the authentic source (Retrieve)
+- Retrieval: Retrieve actual attribute values from the authentic source 
 
-- Find persons by partial attribute matching when exact identifiers are unknown (Identify)
+- Identification: Find persons by partial attribute matching when exact identifiers are unknown
 
 Note: The described Authentic Sources Services are compliant with the eIDAS regulation from a functional standpoint (Ref. ETSI 119 478).
 
 Services
 """"""""
-.. py:function:: discover/internationalDiscover(country)
+
+.. py:function:: FindAttribute(assetType, creator, country, text, semanticDataSpecification, schemaMediaType)
     :noindex:
 
-    Return the uri of the discovery service for a specific country code and return the status of the discover interfaces and the country avaliable for this interface
+    This interface is implemented by a semantic repository which is a catalogue of semantic assets (e.g. attributes, attestation schemes, code lists) enabling the discovery of the unique identifier for a specific attribute and related semantic information and data models. This interface allows to search the semantic repository for attribute-related metadata. 
 
     **Authorization**: none
 
-    :param str country: country code of the targeted country (ISO 3166-1 alpha-2)
-    :return: .. code-block:: json
-
-   {
-     "uri": "<string:uri>",
-     "status" : "<string:enum(Up, Down)>",
-      "supportedCountry" : ["<string:iso3166-alpha2>"]
-   }
-    
-    In case of error the value is replaced with an error code
-
-.. py:function:: discover/search(assetType, creator, country, text, semanticDataSpecification, schemaMediaType)
-    :noindex:
-
-    Searches the semantic repository for available attributes.
-
-    **Authorization**: none
-
-    :param str(fixed: `attribute`) assetType: Asset type to search for; must be `attribute`
-    :param str creator: Filter results by attribute creator name
-    :param str country: Filter results by country code (ISO 3166-1 alpha-2)
-    :param str text: Free-text search across attribute metadata
-    :param str semanticDataSpecification: filter by semantic data specification URI
-    :param str schemaMediaType: Filter by schema media type
+    :param str(fixed: `attribute`) assetType: Asset type to search for; shall be `attribute`
+    :param str creator: Represents the name of the creator of the catalogue asset e.g. entity submitting the attribute to the catalogue
+    :param str country: Filters results by country code (ISO 3166-1 alpha-2). The country code represents the State of the creator of the catalogue asset
+    :param str text: allows a free-text search on the names and descriptions of the catalogued attribute
+    :param str semanticDataSpecification:  URI that allows to filter for a specific semantic data specification that prescribes structured and standardized formats for the organization, description, and interpretation of data to ensure attribute conformity, semantic consistency, and interoperable exchange among systems, applications, and users, independent of the media type. 
+    :param str schemaMediaType: media type according to IETF RFC 6838,  shall filter for the distribution of the data model schema the attribute conforms to. 
     :return: .. code-block:: json
 {
   "attributes": [
@@ -83,10 +66,13 @@ Services
 }
     In case of error the value is replaced with an error code
 
-.. py:function:: discover/retrieve(queryType, attributeIdentifier, country)
+.. py:function:: FindAuthenticSource(queryType, attributeIdentifier, country)
     :noindex:
 
-    Finds data service endpoints for specific attributes.
+    This interface is implemented by a Data Service Directory which is a registry of authentic sources and their data services. The Data Service Directory can be globally unique and contain a global registry of all             authentic sources or most likely is regional (e.g. in EU) or national. In this case, the interface FindDataServiceDirectory is useful to find the endpoint of the relevant regional or national Data Service             Directory. 
+    This interface allows to search the metadata of the authentic source(s) that support data services (verification, retrieval etc.) for the queried attribute(s). 
+    The assumption is that a Data Service Directory supports one semantic repository i.e. all authentic sources registered in the Data Service Directory share the same semantic repository.
+    NOTE: why not extending this to search for provider as well?
 
     **Authorization**: none
 
@@ -118,18 +104,39 @@ Services
        }
      ]
    }
-    In case of error the value is replaced with an error
+    In case of error the value is replaced with an error code
 
-.. py:function:: verify/verify(attributes, attributeFragments, mandate)
+.. py:function:: FindDataServiceDirectory(country)
+    :noindex:
+
+    This interface allows to search the endpoint of the relevant regional or national Data Service Directory and the semantic repositiry that the Data Service Directory supports. 
+
+    **Authorization**: none
+
+    :param str country: country code of the targeted country (ISO 3166-1 alpha-2)
+    :return: .. code-block:: json
+
+   {
+     "DSDuri": "<string:uri>",
+     "SRuri": "<string:uri>",
+     "country" : ["<string:iso3166-alpha2>"]
+   }
+    
+    In case of error the value is replaced with an error code
+
+.. py:function:: verifyIdentity(attributes, attributeFragments, attributeSet, mandate)
     :noindex:
 
     Verify attributes against the authentic source without retrieving full data. Supports full attribute verification, fragment verification (privacy-preserving using JSONPath), or both.
+    In the case of attributes or attributesFragment, the verification provides a result for each attribute. 
+    In the case of attributeSet, the verification is matching all provided identity attributes in the set and computes a global matching result.
     The required identification data of the user shall be contained in the access token provided by the Authorization Server.
 
     **Authorization**: `id.verify`
 
-    :param array attributes: Complete attributes to verify (conditional: required if attributeFragments absent)
-    :param array attributeFragments: Attribute fragments for privacy-preserving verification (conditional: required if attributes absent)
+    :param array attributes: Attributes to verify (conditional: required if attributeFragments absent)
+    :param array attributeFragments: Attribute fragments for privacy-preserving verification (conditional: required if attributes absent) using the JSONPath language according to IETF RFC 9535
+    :param array attributeSet: A set of identity attributes associated to a unique URI and to be verified from the authentic source
     :param object mandate: Mandate for delegated access on behalf of another data subject
     :return: .. code-block:: json
 
@@ -154,31 +161,29 @@ Services
          "fragmentValue": "<any>"
        }
      ],
+     "AttributeSetResults": [
+       {
+         "attributeSetIdentifier": "<string:uri>",
+         "location": "<string:jsonpath>",
+         "attributeSetVerificationResult": "<string:uri:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
+         "VerificationResult": "<string:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
+         "fragmentValue": "<any>"
+       }
+     ],
      "mandateResult": "<MandateResult>"
    }
-    In case of error the value is replaced with an error
+    In case of error the value is replaced with an error code
 
-.. py:function:: verify/verify/{deferredResponseId}(deferredResponseId)
-    :noindex:
-
-    Polls for deferred verification results.
-    The required identification data of the user shall be contained in the access token provided by the Authorization Server.
-
-    **Authorization**: `id.verify`
-
-    :param str:uuid deferredResponseId: Identifier from the deferred response
-    :return: Same as verify/verify response when ready, or HTTP 202 with DeferredResponse while pending
-    In case of error the value is replaced with an error
-
-.. py:function:: retrieve/retrieve(attributeIdentifiers, mandate)
+.. py:function:: readAttributes(attributes, attributeSet, mandate)
     :noindex:
 
     Retrieve actual attribute values from the authentic source.
     The required identification data of the user shall be contained in the access token provided by the Authorization Server.
 
-    **Authorization**: `id.retrieve`
+    **Authorization**: `id.read`
 
-    :param array:uri attributeIdentifiers: URIs of attributes to retrieve from the authentic source (min 1)
+    :param array:uri attributeIdentifiers: URIs of attributes to retrieved from the authentic source (min 1)
+    :param array attributeSet: A set of identity attributes associated to a unique URI and to be retrieved from the authentic source
     :param object mandate: Mandate for delegated retrieval on behalf of another data subject
     :return: .. code-block:: json
 
@@ -186,71 +191,45 @@ Services
      "responseId": "<string:uuid>",
      "provider": "<Provider>",
      "authenticSource": "<Provider>",
-     "attributes": [
+     "attributeReadResults": [
        {
          "attributeIdentifier": "<string:uri>",
          "attributeValue": "<object>",
          "stringRetrieveResult": "<string:enum(Success|Failure)>"
        }
      ],
+    "attributeSetReadResults": [
+      {
+        "attributeSetIdentifier": "<string:uri>",
+  
+        "attributes": [
+          {
+            "attributeIdentifier": "<string:uri>",
+            "attributeValue": "<object>",
+            "stringRetrieveResult": "<string:enum(Success|Failure)>"
+          }
+        ]
+      }
+    ],
      "mandateResult": "<MandateResult>"
    }
-    In case of error the value is replaced with an error
+    In case of error the value is replaced with an error code
 
-.. py:function:: retrieve/retrieve/{deferredResponseId}(deferredResponseId)
-    :noindex:
-
-    Polls for deferred retrieval results.
-    The required identification data of the user shall be contained in the access token provided by the Authorization Server.
-
-    **Authorization**: `id.retrieve`
-
-    :param str:uuid deferredResponseId: Identifier from the deferred response
-    :return: Same as retrieve/retrieve response when ready, or HTTP 202 with DeferredResponse while pending
-    In case of error the value is replaced with an error
-
-.. py:function:: retrieve/readAttributes(outputAttributeSet)
-    :noindex:
-
-    Get a list of identity attributes attached to a user.
-    The required identification data of the user shall be contained in the access token provided by the Authorization Server.
-
-    **Authorization**: `id.read`
-
-    :param list[str] outputAttributeSet: defining the identity attributes to be provided back to the caller
-    :return: An array of the requested attributes
-
-    In case of error (unknown attributes, unauthorized access, etc.) the value is replaced with an error
-
-.. py:function:: 'retrieve/readAttributeSet(Identifier, AttributeSetName)
-    :noindex:
-
-    Get a set of identity attributes as defined by attributeSet, attached to a user.
-    The required identification data of the user shall be contained in the access token provided by the Authorization Server.
-
-    **Authorization**: `id.set.read`
-
-    :param str attributeSetName: The name of predefined attributes set name
-    :return: An array of the requested attributes
-
-    In case of error (unknown attributes, unauthorized access, etc.) the value is replaced with an error
-
-.. py:function:: identify/identify(attributeSet, outputAttributeSet)
+.. py:function:: identify(attributeSet, outputAttributeSet)
     :noindex:
 
     Identify possibly matching identities against an input set of attributes. Returns an array of predefined
     datasets as described by outputAttributeSet.
-    The required identification data of the user shall be contained in the access token provided by the Authorization Server.
 
-    Note: This service may be limited to some specific government RPs
+    Note: This service may be limited to some specific government RPs e.g. law enforcement agencies
 
     **Authorization**: `id.identify`
 
     :param list[str] attributeSet: A list of pair (name,value) requested
     :param list[str] outputAttributeSet: An array of attributes requested
-    :return: Y or N
+    :return: json as specified by outputAttributeSet
     
-    In case of error (unknown attributes, unauthorized access, etc.) the value is replaced with an error
+    In case of error (unknown attributes, unauthorized access, etc.) the value is replaced with an error code
 
 
 Attribute set
