@@ -182,7 +182,7 @@ Services
 
     **Authorization**: `id.read`
 
-    :param array:uri attributeIdentifiers: URIs of attributes to retrieved from the authentic source (min 1)
+    :param array attributes: URIs of attributes to retrieved from the authentic source (min 1)
     :param array attributeSet: A set of identity attributes associated to a unique URI and to be retrieved from the authentic source
     :param object mandate: Mandate for delegated retrieval on behalf of another data subject
     :return: .. code-block:: json
