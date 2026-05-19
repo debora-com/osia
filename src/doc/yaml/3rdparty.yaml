@@ -285,7 +285,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeferredResponse'
+                $ref: '#/components/schemas/TaskId'
         400:
           description: Malformed or invalid request body
           content:
@@ -371,7 +371,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeferredResponse'
+                $ref: '#/components/schemas/TaskId'
         400:
           description: Malformed or invalid request body
           content:
@@ -458,7 +458,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeferredResponse'
+                $ref: '#/components/schemas/TaskId'
         400:
           description: Malformed or invalid request body
           content:
@@ -595,7 +595,7 @@ components:
 
   schemas:
     # Discovery Responses
-    FindAttributeResponse:
+    findAttributeResponse:
       type: object
       required:
         - attributes
@@ -1017,7 +1017,8 @@ components:
           $ref: '#/components/schemas/AttributeSet'
         outputAttributeSetIdentifier:
           description: Attribute set uri describing what attributes are to be read. e.g. "DEFAULT_SET_01", "SET_BIOM_01", "EIDAS", ...
-          type: uri
+          type: string
+          format: uri
       additionalProperties: false
 
     IdentifyResponse:
