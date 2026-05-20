@@ -38,32 +38,35 @@ Services
 
     **Authorization**: none
 
-    :param str(fixed: `attribute`) assetType: Asset type to search for; shall be `attribute`
+    :param str assetType: Asset type to search for; shall be `attribute`
     :param str creator: Represents the name of the creator of the catalogue asset e.g. entity submitting the attribute to the catalogue
     :param str country: Filters results by country code (ISO 3166-1 alpha-2). The country code represents the State of the creator of the catalogue asset
     :param str text: allows a free-text search on the names and descriptions of the catalogued attribute
     :param str semanticDataSpecification:  URI that allows to filter for a specific semantic data specification that prescribes structured and standardized formats for the organization, description, and interpretation of data to ensure attribute conformity, semantic consistency, and interoperable exchange among systems, applications, and users, independent of the media type. 
     :param str schemaMediaType: media type according to IETF RFC 6838,  shall filter for the distribution of the data model schema the attribute conforms to. 
-    :return: .. code-block:: json
-    {
-      "attributes": [
-        {
-          "attributeIdentifier": "<string:uri>",
-          "title": [
-            { "value": "<string>", "language": "<string:iso639-1>" }
-          ],
-          "description": [
-            { "value": "<string>", "language": "<string:iso639-1>" }
-          ],
-          "creator": "<string>",
-          "country": "<string:iso3166-alpha2>",
-          "semanticDataSpecification": "<string:uri>",
-          "schemaDistribution": [
-            { "accessURL": "<string:uri>", "mediaType": "<string>" }
-          ]
-        }
-      ]
-    }
+    :return: 
+    
+    .. code-block:: json
+          {
+            "attributes": [
+              {
+                "attributeIdentifier": "<string:uri>",
+                "title": [
+                  { "value": "<string>", "language": "<string:iso639-1>" }
+                ],
+                "description": [
+                  { "value": "<string>", "language": "<string:iso639-1>" }
+                ],
+                "creator": "<string>",
+                "country": "<string:iso3166-alpha2>",
+                "semanticDataSpecification": "<string:uri>",
+                "schemaDistribution": [
+                  { "accessURL": "<string:uri>", "mediaType": "<string>" }
+                ]
+              }
+            ]
+          }
+
     In case of error the value is replaced with an error code
 
 .. py:function:: FindAuthenticSource(queryType, attributeIdentifier, country)
@@ -79,31 +82,34 @@ Services
     :param str(fixed: `dataServices`) queryType: Query type; must be `dataServices`
     :param str:uri attributeIdentifier: Unique URI identifier for the attribute
     :param str country: Filter data services by country code (ISO 3166-1 alpha-2)
-    :return: .. code-block:: json
+    :return: 
+    
+    .. code-block:: json
 
-   {
-     "dataServices": [
-       {
-         "attributeIdentifier": "<string:uri>",
-         "endpointDescription": "<string:uri>",
-         "endpointURI": "<string:uri>",
-         "provider": {
-           "legalName": "<string>",
-           "identifiers": [
-             {
-               "type": "<string:uri>",
-               "identifier": "<string>"
-             }
-           ],
-           "establishedByLaw": {
-             "legislativeIdentifier": "<string:uri>",
-             "legalBasis": "<string>"
-           }
-         },
-         "country": "<string:iso3166-alpha2>"
-       }
-     ]
-   }
+          {
+            "dataServices": [
+              {
+                "attributeIdentifier": "<string:uri>",
+                "endpointDescription": "<string:uri>",
+                "endpointURI": "<string:uri>",
+                "provider": {
+                  "legalName": "<string>",
+                  "identifiers": [
+                    {
+                      "type": "<string:uri>",
+                      "identifier": "<string>"
+                    }
+                  ],
+                  "establishedByLaw": {
+                    "legislativeIdentifier": "<string:uri>",
+                    "legalBasis": "<string>"
+                  }
+                },
+                "country": "<string:iso3166-alpha2>"
+              }
+            ]
+          }
+
     In case of error the value is replaced with an error code
 
 .. py:function:: FindDataServiceDirectory(country)
@@ -114,13 +120,15 @@ Services
     **Authorization**: none
 
     :param str country: country code of the targeted country (ISO 3166-1 alpha-2)
-    :return: .. code-block:: json
+    :return: 
+    
+    .. code-block:: json
 
-   {
-     "DSDuri": "<string:uri>",
-     "SRuri": "<string:uri>",
-     "country" : ["<string:iso3166-alpha2>"]
-   }
+          {
+            "DSDuri": "<string:uri>",
+            "SRuri": "<string:uri>",
+            "country" : ["<string:iso3166-alpha2>"]
+          }
     
     In case of error the value is replaced with an error code
 
@@ -138,40 +146,43 @@ Services
     :param array attributeFragments: Attribute fragments for privacy-preserving verification (conditional: required if attributes absent) using the JSONPath language according to IETF RFC 9535
     :param array attributeSet: A set of identity attributes associated to a unique URI and to be verified from the authentic source
     :param object mandate: Mandate for delegated access on behalf of another data subject
-    :return: .. code-block:: json
+    :return: 
+    
+    .. code-block:: json
 
-   {
-     "responseId": "<string:uuid>",
-     "provider": "<Provider>",
-     "authenticSource": "<Provider>",
-     "attributeVerificationResults": [
-       {
-         "attributeIdentifier": "<string:uri>",
-         "attributeVerificationResult": "<string:uri:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
-         "VerificationResult": "<string:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
-         "attributeValue": "<object>"
-       }
-     ],
-     "fragmentVerificationResults": [
-       {
-         "attributeIdentifier": "<string:uri>",
-         "location": "<string:jsonpath>",
-         "fragmentVerificationResult": "<string:uri:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
-         "VerificationResult": "<string:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
-         "fragmentValue": "<any>"
-       }
-     ],
-     "AttributeSetResults": [
-       {
-         "attributeSetIdentifier": "<string:uri>",
-         "location": "<string:jsonpath>",
-         "attributeSetVerificationResult": "<string:uri:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
-         "VerificationResult": "<string:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
-         "fragmentValue": "<any>"
-       }
-     ],
-     "mandateResult": "<MandateResult>"
-   }
+          {
+            "responseId": "<string:uuid>",
+            "provider": "<Provider>",
+            "authenticSource": "<Provider>",
+            "attributeVerificationResults": [
+              {
+                "attributeIdentifier": "<string:uri>",
+                "attributeVerificationResult": "<string:uri:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
+                "VerificationResult": "<string:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
+                "attributeValue": "<object>"
+              }
+            ],
+            "fragmentVerificationResults": [
+              {
+                "attributeIdentifier": "<string:uri>",
+                "location": "<string:jsonpath>",
+                "fragmentVerificationResult": "<string:uri:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
+                "VerificationResult": "<string:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
+                "fragmentValue": "<any>"
+              }
+            ],
+            "AttributeSetResults": [
+              {
+                "attributeSetIdentifier": "<string:uri>",
+                "location": "<string:jsonpath>",
+                "attributeSetVerificationResult": "<string:uri:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
+                "VerificationResult": "<string:enum(Match|NoMatch|MatchWithVariation|Unknown)>",
+                "fragmentValue": "<any>"
+              }
+            ],
+            "mandateResult": "<MandateResult>"
+          }
+    
     In case of error the value is replaced with an error code
 
 .. py:function:: readAttributes(attributes, attributeSet, mandate)
@@ -185,34 +196,37 @@ Services
     :param array attributes: URIs of attributes to retrieved from the authentic source (min 1)
     :param array attributeSet: A set of identity attributes associated to a unique URI and to be retrieved from the authentic source
     :param object mandate: Mandate for delegated retrieval on behalf of another data subject
-    :return: .. code-block:: json
+    :return: 
+    
+    .. code-block:: json
 
-   {
-     "responseId": "<string:uuid>",
-     "provider": "<Provider>",
-     "authenticSource": "<Provider>",
-     "attributeReadResults": [
-       {
-         "attributeIdentifier": "<string:uri>",
-         "attributeValue": "<object>",
-         "stringRetrieveResult": "<string:enum(Success|Failure)>"
-       }
-     ],
-    "attributeSetReadResults": [
-      {
-        "attributeSetIdentifier": "<string:uri>",
-  
-        "attributes": [
           {
-            "attributeIdentifier": "<string:uri>",
-            "attributeValue": "<object>",
-            "stringRetrieveResult": "<string:enum(Success|Failure)>"
+            "responseId": "<string:uuid>",
+            "provider": "<Provider>",
+            "authenticSource": "<Provider>",
+            "attributeReadResults": [
+              {
+                "attributeIdentifier": "<string:uri>",
+                "attributeValue": "<object>",
+                "stringRetrieveResult": "<string:enum(Success|Failure)>"
+              }
+            ],
+            "attributeSetReadResults": [
+              {
+                "attributeSetIdentifier": "<string:uri>",
+          
+                "attributes": [
+                  {
+                    "attributeIdentifier": "<string:uri>",
+                    "attributeValue": "<object>",
+                    "stringRetrieveResult": "<string:enum(Success|Failure)>"
+                  }
+                ]
+              }
+            ],
+            "mandateResult": "<MandateResult>"
           }
-        ]
-      }
-    ],
-     "mandateResult": "<MandateResult>"
-   }
+    
     In case of error the value is replaced with an error code
 
 .. py:function:: identify(attributeSet, outputAttributeSet)
